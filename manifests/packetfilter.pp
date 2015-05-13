@@ -11,29 +11,26 @@ class dhcp::packetfilter
 ) inherits dhcp::params
 {
 
-    firewall { "007 ipv4 accept dhcp":
-        provider => 'iptables',
-        chain => 'INPUT',
-        proto => 'udp',
-        action => 'accept',
-        iniface => $iniface ? {
-            'any' => undef,
-            default => $iniface,
-        },
-        sport => [67,68],
-        dport => [67,68],
+
+    $dhcp_iniface = $iniface ? {
+        'any'   => undef,
+        default => $iniface,
     }
 
-    firewall { "007 ipv6 accept dhcp":
+    Firewall {
+        chain    => 'INPUT',
+        proto    => 'udp',
+        action   => 'accept',
+        sport    => [67,68],
+        dport    => [67,68],
+        iniface  => $dhcp_iniface,
+    }
+
+    firewall { '007 ipv4 accept dhcp':
+        provider => 'iptables',
+    }
+
+    firewall { '007 ipv6 accept dhcp':
         provider => 'ip6tables',
-        chain => 'INPUT',
-        proto => 'udp',
-        action => 'accept',
-        iniface => $iniface ? {
-            'any' => undef,
-            default => $iniface,
-        },
-        sport => [67,68],
-        dport => [67,68],
     }
 }
